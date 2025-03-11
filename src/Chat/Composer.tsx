@@ -12,10 +12,12 @@ import axios from 'axios';
 import {Icon} from '@/components';
 import {useAppSelector} from '@/hooks/stores';
 import {isConnected} from '@/stores/selectors/chat';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 type Props = {};
 
 const Composer: FC<Props> = () => {
+  const {bottom} = useSafeAreaInsets();
   const connected = useAppSelector(isConnected);
   const inputRef = useRef<TextInput>(null);
   const [text, setText] = useState('');
@@ -34,7 +36,7 @@ const Composer: FC<Props> = () => {
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener('keyboardWillShow', e => {
       console.debug('keyboardWillShow', e);
-      animation(-e.endCoordinates.height);
+      animation(-(e.endCoordinates.height - bottom));
     });
 
     const keyboardWillHide = Keyboard.addListener('keyboardWillHide', e => {

@@ -2,19 +2,36 @@ import Header from './Header';
 import Composer from './Composer';
 import Messages from './Messages';
 
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {io} from 'socket.io-client';
+import {View} from 'react-native';
 
 import {Page} from '@/components';
 import {useAppDispatch} from '@/hooks/stores';
-import {appendMessage, setConnected} from '@/stores/controllers/chat';
-import {View} from 'react-native';
+import {
+  appendMessage,
+  setConnected,
+  setInitialMessages,
+} from '@/stores/controllers/chat';
+import {Storage} from '@/utils';
 
 const Chat = () => {
   const dispatch = useAppDispatch();
+  const [localReady, setLocalReady] = useState(false);
+
+  const fetchInitialMessages = useCallback(async () => {
+    const res = await Storage.load(Storage.KEYS.MESSAGES);
+
+    console.debug('local messages -> ', res);
+    if (res) {
+      dispatch(setInitialMessages(JSON.parse(res as string)));
+    }
+
+    setLocalReady(true);
+  }, [dispatch]);
 
   useEffect(() => {
-    console.debug('useEffect');
+    fetchInitialMessages();
 
     const socket = io('http://localhost:3000');
 
@@ -23,7 +40,6 @@ const Chat = () => {
       dispatch(setConnected(true));
     });
 
-    // Listen for new messages
     socket.on('newMessage', data => {
       console.log('New message received:', data.message);
       console.debug('typeof -> ', typeof data.message);
@@ -48,12 +64,9 @@ const Chat = () => {
           }),
         );
       }
-
-      // Update your UI with the new message
     });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from chat server');
       dispatch(setConnected(false));
     });
 
@@ -66,10 +79,14 @@ const Chat = () => {
   return (
     <Page>
       <Header />
-      <View style={{flex: 1}}>
-        <Messages />
-      </View>
-      <Composer />
+      {localReady && (
+        <>
+          <View style={{flex: 1}}>
+            <Messages />
+          </View>
+          <Composer />
+        </>
+      )}
     </Page>
   );
 };

@@ -2,7 +2,7 @@ import React, {PropsWithChildren} from 'react';
 import {View} from 'react-native';
 import {SafeAreaInsetsContext} from 'react-native-safe-area-context';
 
-import safeAreaInsets from '@/utils/safeAreaInstents';
+import {safeAreaInsets} from '@/utils/helpers';
 
 type Props = {
   removeTop?: boolean;

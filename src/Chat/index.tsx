@@ -1,12 +1,16 @@
+import Header from './Header';
+
 import React from 'react';
 import {View} from 'react-native';
 
-const Chat = () =>{
-  return (
-    <View style={{flex:1}}>
+import {Page} from '@/components';
 
-    </View>
-  )
-}
+const Chat = () => {
+  return (
+    <Page>
+      <Header />
+    </Page>
+  );
+};
 
 export default Chat;

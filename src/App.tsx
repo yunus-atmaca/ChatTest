@@ -1,17 +1,20 @@
-import React from 'react';
-import {View} from 'react-native';
-
 import Chat from './Chat';
+
+import React from 'react';
+
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function App(): React.JSX.Element {
   return (
-    <SafeAreaProvider style={{flex: 1}}>
-      <NavigationContainer>
-        <Chat />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <GestureHandlerRootView>
+      <SafeAreaProvider style={{flex: 1}}>
+        <NavigationContainer>
+          <Chat />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

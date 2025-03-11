@@ -3,16 +3,18 @@ import Svg, {Path, SvgProps} from 'react-native-svg';
 
 export default function Search({color}: SvgProps) {
   return (
-    <Svg width="100%" height="100%" viewBox="0 0 26 26" fill="none">
+    <Svg width="100%" height="100%" viewBox="0 0 125 125" fill="none">
       <Path
-        d="M11.2857 21.5714C16.9664 21.5714 21.5714 16.9664 21.5714 11.2857C21.5714 5.60507 16.9664 1 11.2857 1C5.60507 1 1 5.60507 1 11.2857C1 16.9664 5.60507 21.5714 11.2857 21.5714Z"
-        stroke={color}
+        d="M90.0479 90.0476L118.064 118.064"
+        stroke={color || 'black'}
+        strokeWidth="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M19 19L25 25"
-        stroke={color}
+        d="M6 54.0273C6 80.5519 27.5025 102.055 54.0273 102.055C67.3124 102.055 79.3384 96.6603 88.033 87.9425C96.6979 79.2552 102.055 67.2668 102.055 54.0273C102.055 27.5025 80.5519 6 54.0273 6C27.5025 6 6 27.5025 6 54.0273Z"
+        stroke={color || 'black'}
+        strokeWidth="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

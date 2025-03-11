@@ -1,3 +1,4 @@
+import 'react-native-get-random-values'
 
 import {Provider} from 'react-redux';
 import {AppRegistry} from 'react-native';

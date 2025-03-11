@@ -1,10 +1,14 @@
 import {Icon} from '@/components';
 import styles from './styles/header';
 
-import React, {FC} from 'react';
+import React, {FC, memo} from 'react';
 import {Alert, Image, Text, View} from 'react-native';
+import {useAppSelector} from '@/hooks/stores';
+import {isConnected} from '@/stores/selectors/chat';
 
 const Header: FC = () => {
+  const connected = useAppSelector(isConnected);
+
   const onSearch = () => {
     Alert.alert('Alert', 'Arama butonuna tıklandı', [
       {
@@ -27,11 +31,11 @@ const Header: FC = () => {
         <Text numberOfLines={1} style={{fontSize: 16, fontWeight: 600}}>
           John Doe
         </Text>
-        <Text style={{fontSize: 12}}>Online</Text>
+        {connected && <Text style={{fontSize: 12}}>Online</Text>}
       </View>
       <Icon onClick={onSearch} name="Search" />
     </View>
   );
 };
 
-export default Header;
+export default memo(Header, () => true);

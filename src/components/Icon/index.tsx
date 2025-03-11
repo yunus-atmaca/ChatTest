@@ -21,40 +21,34 @@ export type Props = {
   bgColor?: ColorValue;
   onClick?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
-  scaleFactor?: 'horizontal' | 'vertical';
-  hasContainerStyle?: boolean;
 };
 
 const Icon: FC<Props> = ({
   size = 20,
   containerSize = 32,
   name,
-  color,
-  bgColor,
+  color = '#325FAA',
+  bgColor = 'transparent',
   onClick,
   containerStyle,
-  hasContainerStyle = false,
 }) => {
-  const icColor = color ?? 'blue';
-  const icContainerBg = bgColor ?? 'transparent';
-
   const IconContainer = onClick ? TouchableOpacity : View;
 
   return (
     <IconContainer
       style={[
         styles.container,
-        hasContainerStyle && {
+        {
           height: containerSize,
           width: containerSize,
-          backgroundColor: icContainerBg,
+          backgroundColor: bgColor,
         },
         containerStyle,
       ]}
       onPress={onClick}
       activeOpacity={0.7}>
       <View style={{height: size, width: size}}>
-        {Icons[name]({color: icColor})}
+        {Icons[name]({color: color})}
       </View>
     </IconContainer>
   );

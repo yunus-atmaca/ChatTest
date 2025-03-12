@@ -8,19 +8,23 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import axios from 'axios';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {Icon} from '@/components';
-import {useAppSelector} from '@/hooks/stores';
-import {isConnected} from '@/stores/selectors/chat';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useAppDispatch, useAppSelector} from '@/hooks/stores';
+import {SelectChat} from '@/stores/selectors';
+import {setEditMessage, editUserMessage} from '@/stores/controllers/chat';
 
 type Props = {};
 
 const Composer: FC<Props> = () => {
   const {bottom} = useSafeAreaInsets();
-  const connected = useAppSelector(isConnected);
+  const connected = useAppSelector(SelectChat.isConnected);
+  const editMessage = useAppSelector(SelectChat.editMessage);
   const inputRef = useRef<TextInput>(null);
   const [text, setText] = useState('');
+
+  const dispatch = useAppDispatch();
 
   const posY = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => {
@@ -35,12 +39,12 @@ const Composer: FC<Props> = () => {
 
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener('keyboardWillShow', e => {
-      console.debug('keyboardWillShow', e);
+      //console.debug('keyboardWillShow', e);
       animation(-(e.endCoordinates.height - bottom));
     });
 
     const keyboardWillHide = Keyboard.addListener('keyboardWillHide', e => {
-      console.debug('keyboardWillHide', e);
+      //console.debug('keyboardWillHide', e);
       animation(0);
     });
 
@@ -50,6 +54,20 @@ const Composer: FC<Props> = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (editMessage) {
+      inputRef.current?.focus();
+      setText(editMessage.text);
+    }
+  }, [editMessage]);
+
+  const onCancel = () => {
+    dispatch(setEditMessage(null));
+    inputRef.current?.blur();
+    inputRef.current?.clear();
+    setText('');
+  };
+
   const onSend = async () => {
     if (!connected) return;
     if (!text) return;
@@ -57,25 +75,34 @@ const Composer: FC<Props> = () => {
     Keyboard.dismiss();
     inputRef.current?.blur();
 
-    try {
-      const res = await axios.post(
-        'http://localhost:3000/api/sendSocketMessage',
-        {
-          message: {
-            text,
-            sender: 'client',
-          },
-        },
-      );
-      console.debug('res => ', res);
+    if (editMessage) {
+      console.debug('editMessage -> ', editMessage);
+      const message: IMessage = {...editMessage, text: text};
+      dispatch(editUserMessage(message));
+      console.debug('message => ', message);
       inputRef.current?.clear();
       setText('');
-    } catch (error) {
-      console.debug('SendMessage Error -> ', error);
+    } else {
+      try {
+        const res = await axios.post(
+          'http://localhost:3000/api/sendSocketMessage',
+          {
+            message: {
+              text,
+              sender: 'client',
+            },
+          },
+        );
+        //console.debug('res => ', res);
+        inputRef.current?.clear();
+        setText('');
+      } catch (error) {
+        console.debug('SendMessage Error -> ', error);
 
-      Alert.alert('Alert', 'Mesaj gönderilemedi.', [
-        {text: 'Tamam', onPress: () => console.log('OK Pressed')},
-      ]);
+        Alert.alert('Alert', 'Mesaj gönderilemedi.', [
+          {text: 'Tamam', onPress: () => console.log('OK Pressed')},
+        ]);
+      }
     }
   };
 
@@ -93,12 +120,22 @@ const Composer: FC<Props> = () => {
           />
         </View>
       </View>
+      {editMessage && (
+        <Icon
+          onClick={onCancel}
+          containerStyle={{marginEnd: 8}}
+          color={'white'}
+          bgColor={'red'}
+          containerSize={40}
+          name={'Close'}
+        />
+      )}
       <Icon
         onClick={onSend}
         color={'white'}
         bgColor={'#325FAA'}
         containerSize={40}
-        name="Send"
+        name={editMessage ? 'Check' : 'Send'}
       />
     </Animated.View>
   );

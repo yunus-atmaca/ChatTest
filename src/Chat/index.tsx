@@ -11,7 +11,7 @@ import {useAppDispatch} from '@/hooks/stores';
 import {
   appendMessage,
   setConnected,
-  setInitialMessages,
+  setInitialChats,
 } from '@/stores/controllers/chat';
 import {Storage} from '@/utils';
 
@@ -19,19 +19,18 @@ const Chat = () => {
   const dispatch = useAppDispatch();
   const [localReady, setLocalReady] = useState(false);
 
-  const fetchInitialMessages = useCallback(async () => {
-    const res = await Storage.load(Storage.KEYS.MESSAGES);
+  const fetchInitialChats = useCallback(async () => {
+    //Storage.remove(Storage.KEYS.CHATS);
+    //return;
+    const res = (await Storage.load(Storage.KEYS.CHATS)) as string;
 
-    console.debug('local messages -> ', res);
-    if (res) {
-      dispatch(setInitialMessages(JSON.parse(res as string)));
-    }
+    if (res) dispatch(setInitialChats(JSON.parse(res)));
 
     setLocalReady(true);
   }, [dispatch]);
 
   useEffect(() => {
-    fetchInitialMessages();
+    fetchInitialChats();
 
     const socket = io('http://localhost:3000');
 

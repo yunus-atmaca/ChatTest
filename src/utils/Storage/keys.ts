@@ -1,1 +1,1 @@
-export const MESSAGES = 'messages';
+export const CHATS = 'chats';

@@ -21,13 +21,6 @@ export default StyleSheet.create({
   server: {
     alignSelf: 'baseline',
   },
-  system: {
-    alignSelf: 'center',
-    backgroundColor: 'gray',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
   time: {
     flexDirection: 'row',
     alignItems: 'center',

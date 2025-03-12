@@ -79,9 +79,7 @@ const Composer: FC<Props> = () => {
       console.debug('editMessage -> ', editMessage);
       const message: IMessage = {...editMessage, text: text};
       dispatch(editUserMessage(message));
-      console.debug('message => ', message);
-      inputRef.current?.clear();
-      setText('');
+      onCancel();
     } else {
       try {
         const res = await axios.post(

@@ -1,7 +1,7 @@
 import styles from './styles/composer';
 
 import React, {FC, memo, useCallback, useEffect, useRef, useState} from 'react';
-import {TextInput, Keyboard, View, Alert} from 'react-native';
+import {TextInput, Keyboard, View, Alert, Platform} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,6 +14,8 @@ import {Icon} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks/stores';
 import {SelectChat} from '@/stores/selectors';
 import {setEditMessage, editUserMessage} from '@/stores/controllers/chat';
+
+import ENV from '../../env.json';
 
 type Props = {};
 
@@ -34,23 +36,44 @@ const Composer: FC<Props> = () => {
   });
 
   const animation = useCallback((to: number) => {
-    posY.value = withTiming(to, {duration: 200});
+    posY.value = withTiming(to, {duration: 150});
   }, []);
 
   useEffect(() => {
-    const keyboardWillShow = Keyboard.addListener('keyboardWillShow', e => {
-      //console.debug('keyboardWillShow', e);
-      animation(-(e.endCoordinates.height - bottom));
-    });
+    let keyboardDidShow = null;
+    let keyboardDidHide = null;
+    if (Platform.OS === 'android') {
+      keyboardDidShow = Keyboard.addListener('keyboardDidShow', e => {
+        //console.debug('keyboardWillShow', e);
+        animation(-e.endCoordinates.height);
+      });
 
-    const keyboardWillHide = Keyboard.addListener('keyboardWillHide', e => {
-      //console.debug('keyboardWillHide', e);
-      animation(0);
-    });
+      keyboardDidHide = Keyboard.addListener('keyboardDidHide', e => {
+        //console.debug('keyboardWillHide', e);
+        animation(0);
+      });
+    }
+
+    let keyboardWillShow = null;
+    let keyboardWillHide = null;
+    if (Platform.OS === 'ios') {
+      keyboardWillShow = Keyboard.addListener('keyboardWillShow', e => {
+        //console.debug('keyboardWillShow', e);
+        animation(-(e.endCoordinates.height - bottom));
+      });
+
+      keyboardWillHide = Keyboard.addListener('keyboardWillHide', e => {
+        //console.debug('keyboardWillHide', e);
+        animation(0);
+      });
+    }
 
     return () => {
-      keyboardWillShow.remove();
-      keyboardWillHide.remove();
+      if (keyboardWillShow) keyboardWillShow.remove();
+      if (keyboardWillHide) keyboardWillHide.remove();
+
+      if (keyboardDidHide) keyboardDidHide.remove();
+      if (keyboardDidShow) keyboardDidShow.remove();
     };
   }, []);
 
@@ -76,22 +99,18 @@ const Composer: FC<Props> = () => {
     inputRef.current?.blur();
 
     if (editMessage) {
-      console.debug('editMessage -> ', editMessage);
       const message: IMessage = {...editMessage, text: text};
       dispatch(editUserMessage(message));
       onCancel();
     } else {
       try {
-        const res = await axios.post(
-          'http://localhost:3000/api/sendSocketMessage',
-          {
-            message: {
-              text,
-              sender: 'client',
-            },
+        const res = await axios.post(`${ENV.URL}/api/sendSocketMessage`, {
+          message: {
+            text,
+            sender: 'client',
           },
-        );
-        //console.debug('res => ', res);
+        });
+        console.debug('res => ', res);
         inputRef.current?.clear();
         setText('');
       } catch (error) {

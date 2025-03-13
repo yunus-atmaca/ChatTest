@@ -15,6 +15,8 @@ import {
 } from '@/stores/controllers/chat';
 import {Storage} from '@/utils';
 
+import ENV from '../../env.json';
+
 const Chat = () => {
   const dispatch = useAppDispatch();
   const [localReady, setLocalReady] = useState(false);
@@ -32,7 +34,7 @@ const Chat = () => {
   useEffect(() => {
     fetchInitialChats();
 
-    const socket = io('http://localhost:3000');
+    const socket = io(ENV.URL);
 
     socket.on('connect', () => {
       console.log('Connected to chat server');

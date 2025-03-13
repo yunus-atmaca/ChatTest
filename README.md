@@ -1,13 +1,13 @@
 ## Build and run your app
 
-Clone this repository
+Clone this repository and
 Install dependencies:
 ```sh
 yarn
 ```
 
 ### Android
-``http://localhost:3000`` is not working for Android. Put the local IP to ``env.json (root/env.json)``. Ex: ``http://192.168.x.x:3000`` something like that.
+``http://localhost:3000`` is not working for Android. To fix this, put the local IP to ``env.json (root/env.json)``. Ex: ``http://192.168.x.x:3000`` something like that.
 
 ```sh
 yarn android
